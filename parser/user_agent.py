@@ -16,7 +16,5 @@ class UserAgentPool:
         ]
 
     def get_random_ua(self):
-        return random.choice(self.ua_pool)
-
-
-print(ua_pool.get_random_ua())
+        chosen_ua = random.choice(self.ua_pool)
+        return {"User-Agent": chosen_ua}
