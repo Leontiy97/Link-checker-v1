@@ -20,6 +20,7 @@ async def fetch_by_pw(url):
         page = await browser.new_page()
         await page.goto(url, wait_until="load")
         await page.screenshot(path="screenshot.png")
+        await browser.close()
 
 
 async def first_script(url):
