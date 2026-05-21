@@ -2,17 +2,16 @@ import asyncio
 import httpx
 from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright
+from parser.user_agent import UserAgentPool
 
 
-async def fetch_by_httpx(url):
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
-    async with httpx.AsyncClient(headers=headers, follow_redirects=True) as client:
+async def fetch_by_httpx(url: str) -> BeautifulSoup:
+    ua_pool = UserAgentPool()
+    async with httpx.AsyncClient(headers=ua_pool.get_random_ua(), follow_redirects=True) as client:
         response = await client.get(url)
         html = BeautifulSoup(response.text, "html.parser")
         print(str(html)[:200])
-        return
+        return html
 
 async def fetch_by_pw(url):
     async with async_playwright() as playwright:
@@ -27,5 +26,5 @@ async def first_script(url):
     await  fetch_by_httpx(url)
     await fetch_by_pw(url)
 
-
-asyncio.run(first_script("https://dzen.ru"))
+test_url = "https://dzen.ru"
+asyncio.run(first_script(test_url))

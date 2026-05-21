@@ -2,3 +2,8 @@ __pycache__/
 .venv/
 screenshot.png
 .idea/
+*.pyc
+.env
+dist/
+build/
+*.egg-info/
