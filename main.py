@@ -3,16 +3,11 @@ import httpx
 from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright
 
+from parser.link_cheker_v1 import LinkChecker
 from parser.user_agent import UserAgentPool
 
 
-async def fetch_by_httpx(ref_page: str) -> BeautifulSoup:
-    ua_pool = UserAgentPool()
-    async with httpx.AsyncClient(headers=ua_pool.get_random_ua(), follow_redirects=True) as client:
-        response = await client.get(ref_page)
-        html = BeautifulSoup(response.text, "html.parser")
-        print(str(html)[:200])
-        return html
+
 
 async def fetch_by_pw(ref_page):
     async with async_playwright() as playwright:
@@ -23,9 +18,12 @@ async def fetch_by_pw(ref_page):
         await browser.close()
 
 
-async def first_script(ref_page):
-    await fetch_by_httpx(ref_page)
-    await fetch_by_pw(ref_page)
+async def first_script(ref_page, page_link, anchor_text):
+    httpx_result = LinkChecker(ref_page, page_link, anchor_text)
+    await httpx_result.run()
+    # await fetch_by_pw(ref_page)
 
-test_url = "https://dzen.ru"
-asyncio.run(first_script(test_url))
+test_url = "https://parsemachine.com/sandbox/"
+test_link = "/",
+test_anchor = "Parsemachine"
+asyncio.run(first_script(test_url, test_link, test_anchor))
