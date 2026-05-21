@@ -1,12 +1,12 @@
 from enum import Enum
 
 
-class verdicts(Enum):
-    FOUND: "anchor + url found"
-    LINK_DELETED: "anchor + url not found"
-    ANCHOR_NOT_FOUND: "wrong anchor"
-    LINK_MISMATCH: "anchor found, wrong url"
-    REDIRECT_DETECTED: "page redirect"
-    CAPTCHA_BLOCK: "access forbidden from CF"
-    NETWORK_ERROR: "network error"
-    SERVER_ERROR: "error during load page"
+class Verdicts(Enum):
+    FOUND = "FOUND: anchor + url"
+    LINK_DELETED = "DELETED: anchor + url"
+    ANCHOR_NOT_FOUND = "PARTIAL FOUND: wrong anchor"
+    LINK_MISMATCH = "PARTIAL FOUND: wrong url"
+    REDIRECT_DETECTED = "ERROR: page redirect"
+    CAPTCHA_BLOCK = "BLOCKED: access forbidden from CF"
+    NETWORK_ERROR = "ERROR: network issues"
+    SERVER_ERROR = "ERROR: some server error"
