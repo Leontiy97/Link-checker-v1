@@ -10,3 +10,4 @@ class Verdicts(Enum):
     CAPTCHA_BLOCK = "BLOCKED: access forbidden from CF"
     NETWORK_ERROR = "ERROR: network issues"
     SERVER_ERROR = "ERROR: some server error"
+    FALLBACK_NEEDED = "Rechecking by Playwright"

@@ -11,4 +11,4 @@ class LinkChecker:
     async def run(self):
         run_with_httpx = HttpxPage(self.ref_page)
         result = await run_with_httpx.find_link_or_anchor(self.page_link, self.anchor_text)
-        print(result)
+        return result
