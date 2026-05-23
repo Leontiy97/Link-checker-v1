@@ -20,7 +20,7 @@ class HttpxPage(BasePage):
             final_url, html = await fetch_by_httpx(self.ref_page)
         except Exception as e:
             print(f"Network error: {e}")
-            return Verdicts.NETWORK_ERROR
+            return Verdicts.FALLBACK_NEEDED
 
         if final_url != self.ref_page:
             return Verdicts.REDIRECT_DETECTED

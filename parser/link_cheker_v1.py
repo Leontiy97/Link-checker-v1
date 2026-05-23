@@ -1,4 +1,5 @@
 from parser.httpx_page import HttpxPage
+from parser.pw_page import PlaywrightPage
 from parser.verdicts import Verdicts
 
 
@@ -11,4 +12,8 @@ class LinkChecker:
     async def run(self):
         run_with_httpx = HttpxPage(self.ref_page)
         result = await run_with_httpx.find_link_or_anchor(self.page_link, self.anchor_text)
+        if result != Verdicts.FOUND:
+            run_with_pw = PlaywrightPage(self.ref_page)
+            result = await run_with_pw.find_link_or_anchor(self.page_link, self.anchor_text)
+
         return result
