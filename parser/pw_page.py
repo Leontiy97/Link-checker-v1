@@ -1,5 +1,3 @@
-from typing import Any, Coroutine
-
 from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright
 
@@ -12,21 +10,27 @@ from parser.verdicts import Verdicts
 async def fetch_by_pw(ref_page) -> tuple[str, BeautifulSoup]:
     async with async_playwright() as playwright:
         ua_pool = UserAgentPool().get_random_ua()["User-Agent"]
-        browser = await playwright.chromium.launch(headless=True)
-        page = await browser.new_page(user_agent=ua_pool)
-        await page.goto(ref_page, wait_until="domcontentloaded")
-        final_url = page.url
-        pw_html = str(await page.content())
-        html = BeautifulSoup(pw_html, "html.parser")
-        await browser.close()
-        return final_url, html
+        browser = None
+        try:
+            browser = await playwright.chromium.launch(headless=True)
+            context = await browser.new_context(user_agent=ua_pool)
+            page = await context.new_page()
+            await page.goto(ref_page, wait_until="domcontentloaded")
+            final_url = page.url
+            pw_html = str(await page.content())
+            html = BeautifulSoup(pw_html, "html.parser")
+            return final_url, html
+        finally:
+            if browser:
+                await browser.close()
 
 
-def captcha_is_detected(html):
-    captcha_markers = CaptchaMarkers()
-    for text in captcha_markers.take_markers():
-        if text in html:
+def captcha_is_detected(html) -> bool:
+    html_text = str(html).lower()
+    for marker in CaptchaMarkers().take_markers():
+        if marker.lower() in html_text:
             return True
+    return False
 
 
 class PlaywrightPage(BasePage):

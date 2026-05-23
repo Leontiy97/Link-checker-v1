@@ -1,8 +1,9 @@
 import httpx
 from bs4 import BeautifulSoup
-from httpx import URL
+from httpx import URL, NetworkError
 
 from parser.base_page import BasePage
+from parser.captcha_markers import CaptchaMarkers
 from parser.user_agent import UserAgentPool
 from parser.verdicts import Verdicts
 
@@ -14,16 +15,29 @@ async def fetch_by_httpx(ref_page: str) -> tuple[URL, BeautifulSoup]:
         html = BeautifulSoup(response.text, "html.parser")
         return final_url, html
 
+def captcha_is_detected(html) -> bool:
+    html_text = str(html).lower()
+    for marker in CaptchaMarkers().take_markers():
+        if marker.lower() in html_text:
+            return True
+    return False
+
 class HttpxPage(BasePage):
     async def find_link_or_anchor(self, page_link: str, anchor_text: str):
         try:
             final_url, html = await fetch_by_httpx(self.ref_page)
-        except Exception as e:
+        except NetworkError as e:
             print(f"Network error: {e}")
+            return Verdicts.NETWORK_ERROR
+        except Exception as e:
+            print(f"Unexpected error in HttpxPage: {e}")
             return Verdicts.FALLBACK_NEEDED
 
         if final_url != self.ref_page:
             return Verdicts.REDIRECT_DETECTED
+
+        if captcha_is_detected(html):
+            return Verdicts.CAPTCHA_BLOCK
 
         try:
             found_link = False
