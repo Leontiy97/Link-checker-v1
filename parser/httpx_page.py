@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from httpx import URL, NetworkError
 
 from parser.base_page import BasePage
-from parser.captcha_markers import CaptchaMarkers
+from parser.captcha_markers import CaptchaMarkers, captcha_is_detected
 from parser.user_agent import UserAgentPool
 from parser.verdicts import Verdicts
 
@@ -14,13 +14,6 @@ async def fetch_by_httpx(ref_page: str) -> tuple[URL, BeautifulSoup]:
         final_url = response.url
         html = BeautifulSoup(response.text, "html.parser")
         return final_url, html
-
-def captcha_is_detected(html) -> bool:
-    html_text = str(html).lower()
-    for marker in CaptchaMarkers().take_markers():
-        if marker.lower() in html_text:
-            return True
-    return False
 
 class HttpxPage(BasePage):
     async def find_link_or_anchor(self, page_link: str, anchor_text: str):

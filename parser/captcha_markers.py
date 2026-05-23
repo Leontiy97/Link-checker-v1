@@ -15,3 +15,10 @@ class CaptchaMarkers:
         for marker in self.markers:
             all_markers.append(marker)
         return all_markers
+
+def captcha_is_detected(html) -> bool:
+    html_text = str(html).lower()
+    for marker in CaptchaMarkers().take_markers():
+        if marker.lower() in html_text:
+            return True
+    return False

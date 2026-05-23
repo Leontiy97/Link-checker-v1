@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright
 
 from parser.base_page import BasePage
-from parser.captcha_markers import CaptchaMarkers
+from parser.captcha_markers import captcha_is_detected
 from parser.user_agent import UserAgentPool
 from parser.verdicts import Verdicts
 
@@ -23,14 +23,6 @@ async def fetch_by_pw(ref_page) -> tuple[str, BeautifulSoup]:
         finally:
             if browser:
                 await browser.close()
-
-
-def captcha_is_detected(html) -> bool:
-    html_text = str(html).lower()
-    for marker in CaptchaMarkers().take_markers():
-        if marker.lower() in html_text:
-            return True
-    return False
 
 
 class PlaywrightPage(BasePage):
@@ -68,5 +60,5 @@ class PlaywrightPage(BasePage):
                 return Verdicts.LINK_DELETED
 
         except Exception as e:
-            print(f"Error in HttpxPage: {e}")
+            print(f"Error in PlaywrightPage: {e}")
             return Verdicts.SERVER_ERROR
