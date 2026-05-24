@@ -9,10 +9,6 @@ async def first_script(ref_page, page_link, anchor_text):
     result = await httpx_result.run()
     print(result)
 
-test_url = "https://parsemachine.com/sandbox/"
-test_link = "/order/"
-test_anchor = "Заказать парсинг"
-test_link_1 = "/order/"
-test_anchor_1 = "Заказать парсин"
+
 asyncio.run(first_script(test_url, test_link, test_anchor))
-asyncio.run(first_script(test_url, test_link_1, test_anchor_1))
+asyncio.run(first_script(test_url_1, test_link_1, test_anchor_1))
