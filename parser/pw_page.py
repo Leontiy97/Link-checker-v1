@@ -47,10 +47,10 @@ class PlaywrightPage(BasePage):
             for element in html.find_all('a'):
                 href_link = element.get('href')
                 href_anchor = element.get_text(strip=True)
-                if url_normalise(href_link) == normal_page_link and href_anchor == anchor_text:
-                    return Verdicts.FOUND
-                if url_normalise(href_link) == normal_page_link:
+                if href_link is not None and url_normalise(href_link) == normal_page_link:
                     found_link = True
+                    if href_anchor == anchor_text:
+                        return Verdicts.FOUND
                 if href_anchor == anchor_text:
                     found_anchor = True
 
