@@ -11,7 +11,7 @@ from parser.verdicts import Verdicts
 
 async def fetch_by_httpx(ref_page: str) -> tuple[str, BeautifulSoup]:
     ua_pool = UserAgentPool()
-    async with httpx.AsyncClient(headers=ua_pool.get_random_ua(), follow_redirects=True, verify=certifi.where()) as client:
+    async with httpx.AsyncClient(headers=ua_pool.get_random_ua(), follow_redirects=True) as client:
         response = await client.get(ref_page)
         final_url = str(response.url)
         html = BeautifulSoup(response.text, "html.parser")
