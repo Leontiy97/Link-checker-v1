@@ -22,4 +22,5 @@ async def run_from_excel(filepath):
         page_link = row[col_link - 1].value
 
         result = await first_script(ref_page, page_link, anchor)
+        print(result)
         row[col_verdict-1].value = result.value

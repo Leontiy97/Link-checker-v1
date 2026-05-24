@@ -1,7 +1,4 @@
-import os
-
-import certifi
-from playwright.async_api import async_playwright, Page, Browser, Playwright
+from playwright.async_api import async_playwright
 from parser.base_page import BasePage
 from parser.captcha_markers import captcha_is_detected
 from parser.user_agent import UserAgentPool
