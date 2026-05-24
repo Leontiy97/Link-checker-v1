@@ -1,5 +1,6 @@
-from typing import Any, Coroutine
+import os
 
+import certifi
 from playwright.async_api import async_playwright, Page, Browser, Playwright
 from parser.base_page import BasePage
 from parser.captcha_markers import captcha_is_detected
@@ -9,10 +10,11 @@ from parser.verdicts import Verdicts
 
 
 async def fetch_by_pw(ref_page) -> tuple[Playwright, Browser, str, Page]:
+    os.environ["SSL_CERT_FILE"] = certifi.where()
     playwright = await async_playwright().start()
     ua_pool = UserAgentPool().get_random_ua()["User-Agent"]
-    browser = await playwright.chromium.launch(headless=False)
-    context = await browser.new_context(user_agent=ua_pool)
+    browser = await playwright.chromium.launch(headless=True)
+    context = await browser.new_context(user_agent=ua_pool, )
     page = await context.new_page()
     await page.goto(ref_page, wait_until="domcontentloaded")
     final_url = page.url
