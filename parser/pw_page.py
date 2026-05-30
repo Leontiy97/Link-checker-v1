@@ -9,7 +9,7 @@ class PlaywrightPage(BasePage):
     async def find_link_or_anchor(self, page_link: str, anchor_text: str):
         async with async_playwright() as playwright:
             ua_pool = UserAgentPool().get_random_ua()["User-Agent"]
-            browser = await playwright.chromium.launch(headless=True)
+            browser = await playwright.chromium.launch(headless=False)
             context = await browser.new_context(user_agent=ua_pool, )
 
             try:
@@ -25,7 +25,7 @@ class PlaywrightPage(BasePage):
                 await page.wait_for_timeout(5000)
                 await page.evaluate("window.scrollTo(0, document.body.scrollHeight / 2)")
                 await page.wait_for_timeout(5000)
-                await page.evaluate("window.scrollTo(0, document.body.scrollHeight / 2)")
+                await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
                 normal_page_link = url_normalise(page_link)
                 normal_anchor = normalise_anchor(anchor_text)
 

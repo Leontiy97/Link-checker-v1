@@ -12,3 +12,4 @@ class Verdicts(Enum):
     SSL_ERROR = "ERROR: SSL certificate verification failed"
     SERVER_ERROR = "ERROR: some server error"
     FALLBACK_NEEDED = "Rechecking by Playwright"
+    SYSTEM_ERROR = "Ooops: something happens during row check"
