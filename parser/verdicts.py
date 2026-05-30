@@ -9,5 +9,6 @@ class Verdicts(Enum):
     LINK_DELETED = "DELETED: anchor + url"
     CAPTCHA_BLOCK = "BLOCKED: access forbidden from CF"
     NETWORK_ERROR = "ERROR: network issues"
+    SSL_ERROR = "ERROR: SSL certificate verification failed"
     SERVER_ERROR = "ERROR: some server error"
     FALLBACK_NEEDED = "Rechecking by Playwright"

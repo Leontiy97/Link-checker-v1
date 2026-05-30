@@ -7,7 +7,8 @@ class CaptchaMarkers:
             "Checking your browser",
             "cf-challenge",
             "cf_challenge",
-            "<div class='cf-turnstile'"
+            "<div class='cf-turnstile'",
+            "https://challenges.cloudflare.com"
         ]
 
     def take_markers(self):

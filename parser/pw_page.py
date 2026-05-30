@@ -2,7 +2,7 @@ from playwright.async_api import async_playwright
 from parser.base_page import BasePage
 from parser.captcha_markers import captcha_is_detected
 from parser.user_agent import UserAgentPool
-from parser.utils import url_normalise
+from parser.utils import url_normalise, normalise_anchor
 from parser.verdicts import Verdicts
 
 class PlaywrightPage(BasePage):
@@ -17,16 +17,17 @@ class PlaywrightPage(BasePage):
                 await page.goto(self.ref_page, wait_until="domcontentloaded")
                 final_url = page.url
 
-                if url_normalise(final_url) != self.ref_page:
-                    return Verdicts.REDIRECT_DETECTED
                 if captcha_is_detected(await page.content()):
                     return Verdicts.CAPTCHA_BLOCK
+                if url_normalise(final_url) != self.ref_page:
+                    return Verdicts.REDIRECT_DETECTED
 
                 await page.wait_for_timeout(5000)
                 await page.evaluate("window.scrollTo(0, document.body.scrollHeight / 2)")
                 await page.wait_for_timeout(5000)
                 await page.evaluate("window.scrollTo(0, document.body.scrollHeight / 2)")
                 normal_page_link = url_normalise(page_link)
+                normal_anchor = normalise_anchor(anchor_text)
 
                 try:
                     found_link = False
@@ -37,9 +38,9 @@ class PlaywrightPage(BasePage):
                         href_anchor = await element.inner_text()
                         if href_link is not None and url_normalise(href_link) == normal_page_link:
                             found_link = True
-                            if href_anchor == anchor_text:
+                            if normalise_anchor(href_anchor) == normal_anchor:
                                 return Verdicts.FOUND
-                        if href_anchor == anchor_text:
+                        if normalise_anchor(href_anchor) == normal_anchor:
                             found_anchor = True
 
                     if found_link:
@@ -50,10 +51,16 @@ class PlaywrightPage(BasePage):
                         return Verdicts.LINK_DELETED
 
                 except Exception as e:
+                    if "ERR_CERT" in str(e):
+                        print(f"SSL Error in PlaywrightPage: {e}")
+                        return Verdicts.SSL_ERROR
                     print(f"Error in PlaywrightPage: {e}")
                     return Verdicts.SERVER_ERROR
 
             except Exception as e:
+                if "ERR_CERT" in str(e):
+                    print(f"SSL Error in PlaywrightPage: {e}")
+                    return Verdicts.SSL_ERROR
                 print(f"Error to load: {e}")
                 return Verdicts.NETWORK_ERROR
 

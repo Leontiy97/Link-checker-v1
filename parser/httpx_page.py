@@ -5,7 +5,7 @@ from httpx import NetworkError
 from parser.base_page import BasePage
 from parser.captcha_markers import CaptchaMarkers, captcha_is_detected
 from parser.user_agent import UserAgentPool
-from parser.utils import url_normalise
+from parser.utils import url_normalise, normalise_anchor
 from parser.verdicts import Verdicts
 
 async def fetch_by_httpx(ref_page: str) -> tuple[str, BeautifulSoup]:
@@ -20,19 +20,26 @@ class HttpxPage(BasePage):
     async def find_link_or_anchor(self, page_link: str, anchor_text: str):
         try:
             final_url, html = await fetch_by_httpx(self.ref_page)
+        except httpx.ConnectError as e:
+            if "SSL" in str(e):
+                print(f"SSL error: {e}")
+            else:
+                print(f"Other connection error: {e}")
+            return Verdicts.NETWORK_ERROR
         except NetworkError as e:
             print(f"Network error: {e}")
             return Verdicts.NETWORK_ERROR
         except Exception as e:
-            print(f"Unexpected error in HttpxPage: {e}")
+            print(f"Unexpected error in HttpxPage: {type(e).__name__}: {e}")
             return Verdicts.FALLBACK_NEEDED
-
-        if url_normalise(final_url) != self.ref_page:
-            return Verdicts.REDIRECT_DETECTED
 
         if captcha_is_detected(html):
             return Verdicts.CAPTCHA_BLOCK
+        if url_normalise(final_url) != self.ref_page:
+            return Verdicts.REDIRECT_DETECTED
+
         normal_page_link = url_normalise(page_link)
+        normal_anchor = normalise_anchor(anchor_text)
         try:
             found_link = False
             found_anchor = False
@@ -41,9 +48,9 @@ class HttpxPage(BasePage):
                 href_anchor = element.get_text(strip=True)
                 if href_link is not None and url_normalise(href_link) == normal_page_link:
                     found_link = True
-                    if href_anchor == anchor_text:
+                    if normalise_anchor(href_anchor) == normal_anchor:
                         return Verdicts.FOUND
-                if href_anchor == anchor_text:
+                if normalise_anchor(href_anchor) == normal_anchor:
                     found_anchor = True
 
             if found_link:
